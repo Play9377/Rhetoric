@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>土味骚话 | 教学演示</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 700px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .header {
+            background: linear-gradient(to right, #ff6b8b, #ff9a9e);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .header h1 i {
+            font-size: 2rem;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        
+        .api-info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            font-family: monospace;
+            word-break: break-all;
+        }
+        
+        .content-area {
+            padding: 40px 30px;
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .quote-box {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            border-left: 5px solid #ff6b8b;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .quote-text {
+            font-size: 1.8rem;
+            line-height: 1.6;
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .quote-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed #ddd;
+        }
+        
+        .buttons-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            min-width: 160px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, #4a69bd, #6a89cc);
+            color: white;
+            box-shadow: 0 5px 15px rgba(74, 105, 189, 0.4);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(to right, #38ada9, #78e08f);
+            color: white;
+            box-shadow: 0 5px 15px rgba(56, 173, 169, 0.4);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn:active {
+            transform: translateY(-1px);
+        }
+        
+        .loading {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #ff6b8b;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-box {
+            background: #ffeaea;
+            border: 2px solid #ff6b6b;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .error-box i {
+            color: #ff6b6b;
+            margin-right: 10px;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #eee;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ff6b8b;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 0.9rem;
+            background: #f8f9fa;
+            border-top: 1px solid #eee;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #4a69bd;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            animation: slideUp 0.3s ease forwards, fadeOut 0.3s ease 2.7s forwards;
+            display: none;
+        }
+        
+        @keyframes slideUp {
+            from { bottom: 0; opacity: 0; }
+            to { bottom: 30px; opacity: 1; }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        
+        .debug-info {
+            background: #f1f8ff;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-family: monospace;
+            display: none;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                max-width: 95%;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .quote-text {
+                font-size: 1.5rem;
+            }
+            
+            .buttons-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container fade-in">
+        <div class="header">
+            <h1> 土味骚话生成器</h1>
+            <p>每日更新新鲜土味骚话，点击按钮获取下一句</p>
+            <div class="api-info">
+                Via:学而不思则玩，思而不学则摆烂！
+            </div>
+        </div>
+        
+        <div class="content-area">
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>正在获取骚话...</p>
+            </div>
+            
+            <div class="quote-box" id="quote-box">
+                <div class="quote-text" id="quote-text">点击下方按钮获取第一条土味骚话</div>
+                <div class="quote-meta">
+                    <div>
+                        <i class="fas fa-clock"></i> 
+                        <span id="update-time">--:--:--</span>
+                    </div>
+                    <div>
+                        <i class="fas fa-database"></i> 
+                        <span id="api-status">等待连接</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="error-box" id="error-box">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span id="error-text">获取骚话时发生错误</span>
+            </div>
+            
+            <div class="debug-info" id="debug-info">
+                <strong>玛卡巴卡数据:</strong>
+                <pre id="response-data">等待响应...</pre>
+            </div>
+            
+            <div class="buttons-container">
+                <button class="btn btn-secondary" id="copy-btn">
+                    <i class="fas fa-copy"></i> 复制骚话
+                </button>
+                <button class="btn btn-primary" id="next-btn">
+                    <i class="fas fa-forward"></i> 下一条骚话
+                </button>
+                <button class="btn" id="debug-btn" style="background: #6c5ce7; color: white;">
+                    <i class="fas fa-bug"></i> 调试信息
+                </button>
+            </div>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-number" id="total-count">0</div>
+                <div class="stat-label">总获取次数</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="success-count">0</div>
+                <div class="stat-label">成功获取</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="copy-count">0</div>
+                <div class="stat-label">复制次数</div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Via：从入门到入土教学 | 本页面仅供演示使用</p>
+            <p>快捷键：空格键(下一条) | C键(复制) | D键(调试信息)</p>
+        </div>
+    </div>
+    
+    <div class="toast" id="toast"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM元素
+            const quoteText = document.getElementById('quote-text');
+            const copyBtn = document.getElementById('copy-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const debugBtn = document.getElementById('debug-btn');
+            const loading = document.getElementById('loading');
+            const quoteBox = document.getElementById('quote-box');
+            const errorBox = document.getElementById('error-box');
+            const errorText = document.getElementById('error-text');
+            const debugInfo = document.getElementById('debug-info');
+            const responseData = document.getElementById('response-data');
+            const toast = document.getElementById('toast');
+            const updateTime = document.getElementById('update-time');
+            const apiStatus = document.getElementById('api-status');
+            
+            // 统计元素
+            const totalCountElement = document.getElementById('total-count');
+            const successCountElement = document.getElementById('success-count');
+            const copyCountElement = document.getElementById('copy-count');
+            
+            // 状态变量
+            let currentQuote = '';
+            let totalCount = 0;
+            let successCount = 0;
+            let copyCount = 0;
+            let isLoading = false;
+            let showDebug = false;
+            
+            // 显示提示
+            function showToast(message, type = 'info') {
+                toast.textContent = message;
+                toast.style.background = type === 'success' ? '#38ada9' : 
+                                        type === 'error' ? '#ff6b6b' : '#4a69bd';
+                toast.style.display = 'block';
+                
+                // 3秒后隐藏
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                }, 3000);
+            }
+            
+            // 更新时间和状态
+            function updateStatus() {
+                const now = new Date();
+                updateTime.textContent = now.toLocaleTimeString('zh-CN');
+                apiStatus.textContent = '已连接';
+            }
+            
+            // 显示/隐藏加载状态
+            function showLoading() {
+                isLoading = true;
+                loading.style.display = 'flex';
+                quoteBox.style.display = 'none';
+                errorBox.style.display = 'none';
+            }
+            
+            function hideLoading() {
+                isLoading = false;
+                loading.style.display = 'none';
+                quoteBox.style.display = 'block';
+            }
+            
+            // 显示错误
+            function showError(message) {
+                errorText.textContent = message;
+                errorBox.style.display = 'flex';
+                apiStatus.textContent = '连接失败';
+            }
+            
+            function hideError() {
+                errorBox.style.display = 'none';
+            }
+            
+            // 切换调试信息
+            function toggleDebug() {
+                showDebug = !showDebug;
+                debugInfo.style.display = showDebug ? 'block' : 'none';
+                debugBtn.innerHTML = showDebug ? 
+                    '<i class="fas fa-times"></i> 关闭调试' : 
+                    '<i class="fas fa-bug"></i> 调试信息';
+            }
+            
+            // 复制到剪贴板
+            async function copyToClipboard() {
+                if (!currentQuote) {
+                    showToast('请先获取一条骚话', 'error');
+                    return;
+                }
+                
+                try {
+                    await navigator.clipboard.writeText(currentQuote);
+                    copyCount++;
+                    copyCountElement.textContent = copyCount;
+                    showToast('骚话已复制到剪贴板', 'success');
+                } catch (err) {
+                    // 降级方案
+                    const textArea = document.createElement('textarea');
+                    textArea.value = currentQuote;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    
+                    copyCount++;
+                    copyCountElement.textContent = copyCount;
+                    showToast('骚话已复制到剪贴板', 'success');
+                }
+            }
+            
+            // 获取土味情话
+            async function getTiangouQuote() {
+                if (isLoading) return;
+                
+                showLoading();
+                hideError();
+                
+                try {
+                    // API地址
+                    const apiUrl = 'https://api.qqsuu.cn/api/dm-tiangou';
+                    
+                    // 添加时间戳防止缓存
+                    const timestamp = Date.now();
+                    const response = await fetch(`${apiUrl}?t=${timestamp}`);
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
+                    // 获取响应数据
+                    const data = await response.json();
+                    
+                    // 记录原始响应数据
+                    responseData.textContent = JSON.stringify(data, null, 2);
+                    
+                    // 更新统计
+                    totalCount++;
+                    totalCountElement.textContent = totalCount;
+                    
+                    // 解析数据 - 基于实际API响应格式
+                    if (data && data.code === 200) {
+                        // 尝试不同的数据路径
+                        if (data.data && data.data.content) {
+                            currentQuote = data.data.content;
+                        } else if (data.data && typeof data.data === 'string') {
+                            currentQuote = data.data;
+                        } else if (data.msg && data.msg !== 'success') {
+                            currentQuote = data.msg;
+                        } else if (data.content) {
+                            currentQuote = data.content;
+                        } else if (data.text) {
+                            currentQuote = data.text;
+                        } else {
+                            // 如果都不匹配，显示原始数据
+                            currentQuote = JSON.stringify(data, null, 2);
+                        }
+                        
+                        successCount++;
+                        successCountElement.textContent = successCount;
+                        
+                        // 更新显示
+                        quoteText.textContent = currentQuote;
+                        quoteText.classList.add('fade-in');
+                        setTimeout(() => quoteText.classList.remove('fade-in'), 500);
+                        
+                        updateStatus();
+                        showToast('成功获取新骚话', 'success');
+                    } else {
+                        throw new Error('API返回的数据格式不正确');
+                    }
+                    
+                } catch (error) {
+                    console.error('获取骚话失败:', error);
+                    
+                    // 使用备用情话
+                    const fallbackQuotes = [
+                        "你今天有点怪，怪好看的。",
+                        "我不是随便的人，随便起来不是人。",
+                        "你知道我的缺点是什么吗？是缺点你。",
+                        "我想买一块地，你的死心塌地。",
+                        "你最近是不是又胖了？没有啊，为什么这么说？那为什么在我心里的分量越来越重了？",
+                        "你知道你和星星有什么区别吗？星星在天上，你在我心里。",
+                        "你猜我想吃什么？不知道啊。痴痴地望着你。",
+                        "我觉得你今天特别怪，怪可爱的。",
+                        "你知道我为什么感冒了吗？因为着凉了？不，因为我对你完全没有抵抗力。",
+                        "你为什么要害我？害你什么？害我那么喜欢你。",
+                        "你属什么？我属狗。不，你属于我。",
+                        "我觉得你特别像一款游戏，我的世界。",
+                        "你知道我的眼睛为什么这么好看吗？因为我的眼里有你。",
+                        "你猜我想喝什么？不知道啊。我想呵护你。",
+                        "你知道你和猴子的区别是什么吗？猴子住在山洞里，而你住在我心里。",
+                        "我觉得你特别像一本书，越看越想睡。",
+                        "你猜我想打什么？不知道啊。我想打开你的心扉。",
+                        "我觉得你像一款游戏，我的世界。",
+                        "你知道我的缺点是什么吗？缺点你。",
+                        "你猜我想喝什么？我想呵护你。",
+                        "你知道你和星星有什么区别吗？星星在天上，你在我心里。"
+                    ];
+                    
+                    const randomIndex = Math.floor(Math.random() * fallbackQuotes.length);
+                    currentQuote = fallbackQuotes[randomIndex];
+                    quoteText.textContent = currentQuote;
+                    
+                    // 更新统计
+                    totalCount++;
+                    totalCountElement.textContent = totalCount;
+                    
+                    showError(`API请求失败: ${error.message}，已使用备用骚话`);
+                } finally {
+                    hideLoading();
+                }
+            }
+            
+            // 绑定事件
+            copyBtn.addEventListener('click', copyToClipboard);
+            nextBtn.addEventListener('click', getTiangouQuote);
+            debugBtn.addEventListener('click', toggleDebug);
+            
+            // 键盘快捷键
+            document.addEventListener('keydown', function(e) {
+                // 空格键：下一条
+                if (e.code === 'Space') {
+                    e.preventDefault();
+                    getTiangouQuote();
+                }
+                
+                // C键：复制
+                if (e.code === 'KeyC' && !e.ctrlKey) {
+                    e.preventDefault();
+                    copyToClipboard();
+                }
+                
+                // D键：调试信息
+                if (e.code === 'KeyD') {
+                    e.preventDefault();
+                    toggleDebug();
+                }
+                
+                // Enter键：下一条
+                if (e.code === 'Enter' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+                    getTiangouQuote();
+                }
+            });
+            
+            // 初始加载
+            getTiangouQuote();
+            
+            // 每10秒更新一次时间
+            setInterval(updateStatus, 10000);
+        });
+    </script>
+</body>
+</html>
